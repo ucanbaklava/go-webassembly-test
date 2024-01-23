@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <link rel="icon" href="data:," />
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <script src="wasm_exec.js"></script>
+</head>
+
+<body>
+    <div id="content">
+
+        <input type="button" id="generate" value="Generate PDF" />
+
+    </div>
+    <script>
+        const go = new window.Go();
+
+        WebAssembly.instantiateStreaming(fetch("pdf.wasm"), go.importObject).then(
+            (obj) => {
+                go.run(obj.instance);
+            }
+        );
+
+
+        const computeButton = document.getElementById("generate");
+        let input = null;
+
+
+        computeButton.onclick = () => runGenerate();
+
+
+
+        function runGenerate() {
+            const result = window.generatePDF(input);
+            const pdfBlob = new Blob([result], { type: 'application/pdf' });
+
+            // Create a download link
+            const downloadLink = document.createElement('a');
+            downloadLink.innerHTML = "pdf indir"
+            downloadLink.href = URL.createObjectURL(pdfBlob);
+            downloadLink.download = 'converted.pdf';
+
+            document.getElementById("content").append(downloadLink)
+            document.body.append(downloadLink);
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>
