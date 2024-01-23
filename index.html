@@ -34,17 +34,20 @@
 
 
         function runGenerate() {
-            const result = window.generatePDF(input);
-            const pdfBlob = new Blob([result], { type: 'application/pdf' });
+            for (var i = 0; i < 10; i++) {
+                const result = window.generatePDF(input);
+                const pdfBlob = new Blob([result], { type: 'application/pdf' });
 
-            // Create a download link
-            const downloadLink = document.createElement('a');
-            downloadLink.innerHTML = "pdf indir"
-            downloadLink.href = URL.createObjectURL(pdfBlob);
-            downloadLink.download = 'converted.pdf';
+                // Create a download link
+                const downloadLink = document.createElement('a');
+                downloadLink.innerHTML = "pdf indir"
+                downloadLink.href = URL.createObjectURL(pdfBlob);
+                downloadLink.download = 'converted.pdf';
 
-            document.getElementById("content").append(downloadLink)
-            document.body.append(downloadLink);
+                document.getElementById("content").append(downloadLink)
+                document.body.append(downloadLink);
+            }
+
 
         }
 
