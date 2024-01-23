@@ -33,8 +33,13 @@
 
 
 
-        function runGenerate() {
+        async function runGenerate() {
             for (var i = 0; i < 10; i++) {
+                const imageBytes = await getImageBytes("/assets/aras.png")
+
+                const input = new Uint8Array(imageBytes);
+
+                console.log(input)
                 const result = window.generatePDF(input);
                 const pdfBlob = new Blob([result], { type: 'application/pdf' });
 
@@ -49,6 +54,29 @@
             }
 
 
+        }
+
+        async function getImageBytes(url) {
+            try {
+                // Make a GET request to the URL
+                const response = await fetch(url);
+
+                // Check if the request was successful (status code 200)
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch image. Status: ${response}`);
+                }
+
+                // Convert the response body to ArrayBuffer
+                const buffer = await response.arrayBuffer();
+
+                // Convert ArrayBuffer to Uint8Array (image bytes)
+                const imageBytes = new Uint8Array(buffer);
+
+                return imageBytes;
+            } catch (error) {
+                console.error("Error fetching image:", error.message);
+                throw error; // You may want to handle or propagate the error accordingly
+            }
         }
 
 

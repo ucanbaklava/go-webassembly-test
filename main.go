@@ -21,6 +21,9 @@ var f embed.FS
 
 func generatePDF(this js.Value, args []js.Value) interface{} {
 
+	inputBuffer := make([]byte, args[0].Get("byteLength").Int())
+	js.CopyBytesToGo(inputBuffer, args[0])
+
 	label := models.Model{
 		ID:         "242442424",
 		UserID:     "2342424",
@@ -36,7 +39,7 @@ func generatePDF(this js.Value, args []js.Value) interface{} {
 			OrderNumber: "2526",
 			ID:          "312414",
 			URL:         "Oytunsu.com",
-			Logo:        "",
+			Logo:        "aaa",
 		},
 		Content: "",
 		Sender: models.Sender{
@@ -56,14 +59,36 @@ func generatePDF(this js.Value, args []js.Value) interface{} {
 		Settings: models.LabelSettings{
 			Size: "a5",
 			Show: models.ShowSettings{
-				Items:         false,
+				Items:         true,
 				ItemImage:     false,
-				ItemPrice:     false,
-				SenderPhone:   false,
-				SenderAddress: false,
+				ItemPrice:     true,
+				SenderPhone:   true,
+				SenderAddress: true,
 			},
 		},
-		Items:   nil,
+		Items: []models.Item{
+			{
+				Name:     "Kekstra",
+				Quantity: 1,
+				Price:    10,
+				SKU:      "QWSDA",
+				Image:    "",
+			},
+			{
+				Name:     "Topkek",
+				Quantity: 1,
+				Price:    7,
+				SKU:      "KDSDA",
+				Image:    "",
+			},
+			{
+				Name:     "Dankek",
+				Quantity: 1,
+				Price:    10,
+				SKU:      "PRJTL",
+				Image:    "",
+			},
+		},
 		Payment: models.Payment{},
 		Label: models.Label{
 			ID:  "435354",
@@ -103,7 +128,6 @@ func generatePDF(this js.Value, args []js.Value) interface{} {
 	pdf.AddPage()
 
 	contentReader := bytes.NewReader(mng)
-
 	_ = pdf.RegisterImageOptionsReader("mng", gofpdf.ImageOptions{ImageType: "png", ReadDpi: true}, contentReader)
 
 	pdf.ImageOptions(label.CarrierID, 10.0, 15.0, 0, 30, false, gofpdf.ImageOptions{
@@ -281,11 +305,15 @@ func generatePDF(this js.Value, args []js.Value) interface{} {
 	w, h = pdf.GetPageSize()
 	// SALES CHANNEL
 
+	logoReader := bytes.NewReader(inputBuffer)
+	_ = pdf.RegisterImageOptionsReader("logo", gofpdf.ImageOptions{ImageType: "png", ReadDpi: true}, logoReader)
+
 	pdf.SetFont("Roboto Condensed", "", 10)
 	pdf.SetTextColor(0, 0, 0)
 	if label.SalesChannel.Logo != "" {
-
-		pdf.Image(label.SalesChannel.Logo, 10.00, h-45, 0, 25, false, "", 0, "")
+		pdf.ImageOptions("logo", 10.00, h-45, 0, 25, false, gofpdf.ImageOptions{
+			ReadDpi: true,
+		}, 0, "")
 
 	} else if label.SalesChannel.Name != "" {
 		pdf.Text(10.00, h-24, fmt.Sprintf("Bu sipariş %s tarafından gönderilmiştir", label.SalesChannel.Name))
